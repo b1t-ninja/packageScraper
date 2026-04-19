@@ -65,7 +65,7 @@ const mapAllLinks = async () => {
 
 
 const main = async () => {
-  let ls = links.slice(0, 4)
+  let ls = links
   const results: Dependency[] = []
 
   for (const l of ls) {
