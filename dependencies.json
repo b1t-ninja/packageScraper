@@ -1,0 +1,18 @@
+[
+  {
+    "product": ".product(name: \"Loggable\", package: \"loggable\")",
+    "package": ".package(url: \"https://github.com/00yhsp/Loggable.git\", from: \"1.2.1\")"
+  },
+  {
+    "product": ".product(name: \"SupaImageKit\", package: \"supaimagekit\")",
+    "package": ".package(url: \"https://github.com/01000010x/SupaImageKit.git\", from: \"1.0.4\")"
+  },
+  {
+    "product": ".product(name: \"Conf\", package: \"conf\")",
+    "package": ".package(url: \"https://github.com/0111b/Conf.git\", from: \"0.0.5\")"
+  },
+  {
+    "product": ".product(name: \"JSONDecoder-Keypath\", package: \"jsondecoder-keypath\")",
+    "package": ".package(url: \"https://github.com/0111b/JSONDecoder-Keypath.git\", from: \"0.1.0\")"
+  }
+]
