@@ -15,6 +15,7 @@ const context = await browser.newContext({
   deviceScaleFactor: 2,
   locale: 'en-US',
   timezoneId: 'America/New_York',
+  permissions: ['geolocation'],
   extraHTTPHeaders: {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en;q=0.9',
@@ -31,13 +32,20 @@ await context.addInitScript(() => {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const getProductAndPackage = async (url: string): Promise<Dependency> => {
+const getProductAndPackage = async (url: string, isFirst: boolean = false): Promise<Dependency> => {
   const page = await context.newPage();
 
   try {
     page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
-    const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    // Using 'networkidle' for the first page helps solve initial Cloudflare challenges
+    const wait = isFirst ? "networkidle" : "domcontentloaded";
+    const response = await page.goto(url, { waitUntil: wait, timeout: 60_000 });
+    
+    if (response?.status() === 403 || response?.status() === 429) {
+       throw new Error(`BLOCKED: Response status was ${response?.status()}`);
+    }
+    
     if (response?.status() !== 200) {
       console.warn(`Warning: Response status for ${url} was ${response?.status()}`);
     }
@@ -87,21 +95,32 @@ const mapAllLinks = async () => {
 
 
 const main = async () => {
-  let ls = links
+  // Let's process only a small batch first to avoid being blocked.
+  // Change to links.length if you want to process everything.
+  const limit = 1;
+  let ls = links.slice(0, limit)
   const results: Dependency[] = []
 
+  let first = true;
   for (const l of ls) {
     try {
-      // Add a small random delay between requests (1-3 seconds)
-      await sleep(1000 + Math.random() * 2000);
+      // Add a small random delay between requests (2-5 seconds)
+      if (!first) {
+        await sleep(2000 + Math.random() * 3000);
+      }
       
-      let res = await getProductAndPackage(l)
+      let res = await getProductAndPackage(l, first)
+      first = false;
       results.push(res)
       console.log(res.product)
       console.log(res.package)
       console.log("") // empty line for separator
-    } catch (e) {
-      console.error(`Error fetching ${l}:`, e)
+    } catch (e: any) {
+      console.error(`Error fetching ${l}:`, e.message || e)
+      if (e.message?.includes("BLOCKED")) {
+        console.error("Stopping scraper to prevent further blocking.");
+        break;
+      }
     }
   }
 
