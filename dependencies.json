@@ -14,5 +14,9 @@
   {
     "product": ".product(name: \"JSONDecoder-Keypath\", package: \"jsondecoder-keypath\")",
     "package": ".package(url: \"https://github.com/0111b/JSONDecoder-Keypath.git\", from: \"0.1.0\")"
+  },
+  {
+    "product": ".product(name: \"UIPreview\", package: \"uipreview\")",
+    "package": ".package(url: \"https://github.com/0111b/UIPreview.git\", from: \"0.0.3\")"
   }
 ]
